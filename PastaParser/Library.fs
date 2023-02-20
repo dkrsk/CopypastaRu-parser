@@ -8,10 +8,13 @@ open HtmlAgilityPack
 
 
 
+/// Структура с информацией о пасте
 type Pasta = struct
-
+    /// Текст пасты
     val Text : string
+    /// Теги пасты
     val Tags : string[]
+    // Ссылка на пасту
     val Url : string
     new (text : string, tags : string[], url : string) = { Text = text; Tags = tags; Url = url }
 
@@ -19,6 +22,7 @@ end
 
 module PastaParser =
 
+    ///Получает случайную пасту
     let private GetPastaAsync () = task {
     
         let random = new Random(DateTime.Now.Subtract(new DateTime(2023,1,1)).TotalSeconds |> int)
@@ -45,17 +49,18 @@ module PastaParser =
             |> fun r -> r.Content.ReadAsStream()
             |> html.Load
 
-        let node = html.DocumentNode.SelectNodes("//div[@class='iCQ7N']").Item(0)
+        let node = html.DocumentNode.SelectNodes("//div[@class='iCQ7N']").Item(0) // div класс с пастой
 
-        let pasta = new Pasta(node.SelectNodes("//div[@class='afzSy']").Item(0).InnerText,
-            Seq.toArray (seq { for i in node.SelectNodes("//div[@class='e2n0B']").Item(0).ChildNodes do i.InnerHtml }),
+        let pasta = new Pasta(node.SelectNodes("//div[@class='afzSy']").Item(0).InnerText, // div класс с текстом пасты
+            Seq.toArray (seq { for i in node.SelectNodes("//div[@class='e2n0B']").Item(0).ChildNodes do i.InnerHtml }), // div класс с тегами пасты
             pastaURL)
-        
+        // названия классов на сайте это вообще прикол)
 
         return pasta
 
     }
 
+    // Получение текста случайной пасты
     let GetTextOnlyAsync () = task {
     
         let! pasta = GetPastaAsync()
@@ -63,6 +68,8 @@ module PastaParser =
 
     }
 
+    /// <summary>Получение пасты по фильтру</summary>
+    /// <param name="filter">список исключающих тегов для получения пасты</param>
     let rec GetFilteredPastaAsync (filter: string[]) : Task<Pasta> = task {
         
         let! pasta = GetPastaAsync()
