@@ -70,11 +70,11 @@ module PastaParser =
 
     /// <summary>Получение пасты по фильтру</summary>
     /// <param name="filter">список исключающих тегов для получения пасты</param>
-    let rec GetFilteredPastaAsync (filter: string[]) : Task<Pasta> = task {
+    let rec GetFilteredPastaAsync ([<ParamArray>]filter: string[]) : Task<Pasta> = task {
         
         let! pasta = GetPastaAsync()
 
-        match Seq.exists2 (fun a b -> String.Equals(a, b)) (filter |> seq) pasta.Tags with
+        match Seq.exists2 (fun a b -> String.Equals(a, b)) filter pasta.Tags with
         | true -> return! GetFilteredPastaAsync(filter)
         |_ -> return pasta
 
