@@ -36,7 +36,7 @@ module PastaParser =
         let xml = new XmlDocument()
         RequestAsync "https://copypastas.ru/sitemap.xml"
             |> Async.RunSynchronously
-            |> fun r -> r.Content.ReadAsStream()
+            |> (fun r -> task { return! r.Content.ReadAsStreamAsync() }) |> Async.AwaitTask |> Async.RunSynchronously
             |> xml.Load
         
 
@@ -46,7 +46,7 @@ module PastaParser =
         let html = new HtmlDocument()
         RequestAsync pastaURL
             |> Async.RunSynchronously
-            |> fun r -> r.Content.ReadAsStream()
+            |> fun r -> task { return! r.Content.ReadAsStreamAsync() } |> Async.AwaitTask |> Async.RunSynchronously
             |> html.Load
 
         let node = html.DocumentNode.SelectNodes("//div[@class='iCQ7N']").Item(0) // div класс с пастой
