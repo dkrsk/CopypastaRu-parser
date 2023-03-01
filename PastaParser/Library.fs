@@ -74,7 +74,7 @@ module PastaParser =
         
         let! pasta = GetPastaAsync()
 
-        match Seq.exists2 (fun a b -> String.Equals(a, b)) filter pasta.Tags with
+        match Seq.exists (fun s -> Seq.exists  (fun t -> String.Equals(s,t)) pasta.Tags) filter with //idk why exist2 doesn't work
         | true -> return! GetFilteredPastaAsync(filter)
         |_ -> return pasta
 
