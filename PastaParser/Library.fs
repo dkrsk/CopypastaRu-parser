@@ -49,12 +49,13 @@ module PastaParser =
             |> fun r -> task { return! r.Content.ReadAsStreamAsync() } |> Async.AwaitTask |> Async.RunSynchronously
             |> html.Load
 
-        let node = html.DocumentNode.SelectNodes("//div[@class='T7TZH']").Item(0) // div класс с пастой
+        let node = html.DocumentNode.SelectNodes("//main/div/div").Item(0).ChildNodes[1].ChildNodes[1] // div класс с пастой
 
-        let pasta = new Pasta(node.SelectNodes("//div[@class='_6oyPp']").Item(0).InnerText, // div класс с текстом пасты
-            Seq.toArray (seq { for i in node.SelectNodes("//div[@class='_50yka']").Item(0).ChildNodes do i.InnerHtml }), // div класс с тегами пасты
+        let pasta = new Pasta(node.FirstChild.InnerText, // div класс с текстом пасты
+            Seq.toArray (seq { for i in node.ChildNodes[2].ChildNodes do i.ChildNodes[1].InnerText }), // div класс с тегами пасты
             pastaURL)
         // названия классов на сайте это вообще прикол)
+        // админ сайта, я тебя очень люблю, спасибо за обфускацию в некомерческом проекте. Пожалуйста, не меняй html структуру...
 
         return pasta
 
